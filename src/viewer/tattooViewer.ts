@@ -3,7 +3,6 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 
 import walkerFbxUrl from "./walker.fbx?url";
-import dragonImgUrl from "./dragon.jpeg?url";
 
 interface IConfig {
   container: HTMLElement;
@@ -29,6 +28,8 @@ export default class TattooViewer {
   );
 
   private _controls!: OrbitControls;
+
+  private _walkerMesh!: THREE.Mesh<THREE.BufferGeometry, THREE.MeshPhongMaterial>;
 
   constructor({ container, canvas }: IConfig) {
     this._canvas = canvas;
@@ -75,24 +76,17 @@ export default class TattooViewer {
 
     fbxModel.scale.set(0.001, 0.001, 0.001);
 
-    const walkerMesh = fbxModel.children.find((object) => object instanceof THREE.Mesh)! as THREE.Mesh;
+    this._walkerMesh = fbxModel.children.find((object) => object instanceof THREE.Mesh)! as THREE.Mesh<
+      THREE.BufferGeometry,
+      THREE.MeshPhongMaterial
+    >;
 
-    walkerMesh.castShadow = true;
+    this._walkerMesh.castShadow = true;
 
-    (walkerMesh.material as THREE.MeshPhongMaterial).color.setHex(0xffdbac);
-    // TODO 多materials start
-    //
-    const textureLoader = new THREE.TextureLoader(); // 纹理加载器
-    const texture = await textureLoader.loadAsync(dragonImgUrl); // 加载图片，返回Texture对象
-
-    (walkerMesh.material as THREE.MeshPhongMaterial).map = texture;
-    (walkerMesh.material as THREE.MeshPhongMaterial).map!.offset.set(-0.2, 0);
-    (walkerMesh.material as THREE.MeshPhongMaterial).map!.repeat.set(1, 1);
-    // (walkerMesh.material as THREE.MeshPhongMaterial).map!.matrixAutoUpdate = false;
-    // end
+    this._walkerMesh.material.color.setHex(0xffdbac);
 
     // 计算法线
-    walkerMesh.geometry.computeVertexNormals();
+    this._walkerMesh.geometry.computeVertexNormals();
 
     // 渲染器
     this._renderer = new THREE.WebGLRenderer({ canvas: this._canvas, antialias: true });
