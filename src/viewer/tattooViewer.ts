@@ -31,12 +31,16 @@ export default class TattooViewer {
 
   private _walkerMesh!: THREE.Mesh<THREE.BufferGeometry, THREE.MeshPhongMaterial>;
 
+  private _raycaster = new THREE.Raycaster();
+
   constructor({ container, canvas }: IConfig) {
     this._canvas = canvas;
     this._container = container;
     this.init().then(() => {
       // eslint-disable-next-line no-console
       console.log("初始化完成");
+
+      this.bindEvent();
     });
   }
 
@@ -106,6 +110,23 @@ export default class TattooViewer {
 
     // 开启动画
     this.animate();
+  };
+
+  // 捆绑拾取
+
+  private bindEvent = () => {
+    window.addEventListener("mousedown", (e) => {
+      const pointer = {
+        x: (e.clientX / window.innerWidth) * 2 - 1,
+        y: -(e.clientY / window.innerHeight) * 2 + 1,
+      };
+
+      this._raycaster.setFromCamera(pointer, this._camera);
+      // TODO
+      //  判断mesh
+      //  阻止拖动时候触发
+      // const intersects = this._raycaster.intersectObjects(this._scene.children);
+    });
   };
 
   private animate = () => {
