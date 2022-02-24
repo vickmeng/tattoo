@@ -1,7 +1,7 @@
 import "./App.css";
 import { useEffect, useRef } from "react";
 
-import Aside from "./aisde";
+import Aside from "./components/aside";
 import TattooViewer from "./tattooViewer";
 import { globalStore } from "./store/viewer";
 
