@@ -23,14 +23,14 @@ export default class TattooViewer {
   private readonly _scene = new THREE.Scene();
   private _renderer!: THREE.WebGLRenderer;
 
-  private _camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 100);
+  private _camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
 
   private _hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1);
 
   private _dirLight = new THREE.DirectionalLight(0xffffff, 0.3);
 
   private _planeMesh = new THREE.Mesh(
-    new THREE.PlaneGeometry(100, 100),
+    new THREE.PlaneGeometry(5000, 5000),
     new THREE.MeshPhongMaterial({ color: 0x999999, depthWrite: false })
   );
 
@@ -63,20 +63,20 @@ export default class TattooViewer {
     this._scene.background = new THREE.Color(0xa0a0a0);
     // this._scene.fog = new THREE.Fog(0xa0a0a0, 10, 50);
     // 相机
-    this._camera.position.set(-1, 2, 3);
+    this._camera.position.set(-1000, 2000, 3000);
     // 环境光
-    this._hemiLight.position.set(0, 20, 0);
+    this._hemiLight.position.set(0, 3000, 0);
     this._scene.add(this._hemiLight);
 
     // 方向光
-    this._dirLight.position.set(3, 10, 10);
+    this._dirLight.position.set(3000, 3000, 2000);
     this._dirLight.castShadow = true;
-    this._dirLight.shadow.camera.top = 2;
-    this._dirLight.shadow.camera.bottom = -2;
-    this._dirLight.shadow.camera.left = -2;
-    this._dirLight.shadow.camera.right = 2;
+    this._dirLight.shadow.camera.top = 2000;
+    this._dirLight.shadow.camera.bottom = -2000;
+    this._dirLight.shadow.camera.left = -2000;
+    this._dirLight.shadow.camera.right = 2000;
     this._dirLight.shadow.camera.near = 0.1;
-    this._dirLight.shadow.camera.far = 40;
+    this._dirLight.shadow.camera.far = 10000;
     this._scene.add(this._dirLight);
 
     // 地板
@@ -95,7 +95,7 @@ export default class TattooViewer {
 
     this._scene.add(fbxModel);
 
-    fbxModel.scale.set(0.01, 0.01, 0.01);
+    // fbxModel.scale.set(1, 1, 1);
 
     this._walkerMesh = fbxModel.children.find((object) => object instanceof THREE.Mesh)! as THREE.Mesh<
       THREE.BufferGeometry,
@@ -122,8 +122,12 @@ export default class TattooViewer {
     this._controls = new OrbitControls(this._camera, this._renderer.domElement);
     this._controls.enablePan = false;
     // this._controls.enableZoom = false;
-    this._controls.target.set(0, 1, 0);
+    this._controls.target.set(0, 1000, 0);
     this._controls.update();
+
+    this._controls.addEventListener("change", (e) => {
+      console.log(e, this._camera);
+    });
 
     // 开启动画
     this.animate();
