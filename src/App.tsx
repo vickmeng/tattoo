@@ -18,11 +18,11 @@ function App() {
   }, []);
 
   return (
-    <div className={"main-container"}>
+    <div className={"main-container"} ref={containerRef}>
       <Aside />
-      <div style={{ width: "100%", height: "100%" }} ref={containerRef}>
-        <canvas style={{ width: "100%", height: "100%", display: "block" }} ref={canvasRef} />
-      </div>
+      {/* <div style={{ width: "100%", height: "100%" }} > */}
+      <canvas style={{ width: "100%", height: "100%", display: "block" }} ref={canvasRef} />
+      {/* </div> */}
     </div>
   );
 }

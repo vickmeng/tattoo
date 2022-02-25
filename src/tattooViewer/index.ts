@@ -1,12 +1,19 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
+import { DecalGeometry } from "three/examples/jsm/geometries/DecalGeometry";
 
 import walkerFbxUrl from "./walker.fbx?url";
 
 interface IConfig {
   container: HTMLElement;
   canvas: HTMLCanvasElement;
+}
+
+interface ITattooInfo {
+  id: string | number;
+  canvas: HTMLCanvasElement;
+  mesh: THREE.Mesh | null;
 }
 
 export default class TattooViewer {
@@ -31,6 +38,12 @@ export default class TattooViewer {
 
   private _walkerMesh!: THREE.Mesh<THREE.BufferGeometry, THREE.MeshPhongMaterial>;
 
+  private _tattooInfoMap = new Map<string, ITattooInfo>();
+
+  private _activeTattooId: string | null = null;
+
+  private _mouseHelper = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshNormalMaterial());
+
   private _raycaster = new THREE.Raycaster();
 
   constructor({ container, canvas }: IConfig) {
@@ -48,7 +61,7 @@ export default class TattooViewer {
   private init = async () => {
     // 场景
     this._scene.background = new THREE.Color(0xa0a0a0);
-    this._scene.fog = new THREE.Fog(0xa0a0a0, 10, 50);
+    // this._scene.fog = new THREE.Fog(0xa0a0a0, 10, 50);
     // 相机
     this._camera.position.set(-1, 2, 3);
     // 环境光
@@ -71,6 +84,10 @@ export default class TattooViewer {
     this._planeMesh.receiveShadow = true;
     this._scene.add(this._planeMesh);
 
+    // mouseHelper
+    // this._mouseHelper.visible = false;
+    this._scene.add(this._mouseHelper);
+
     // 加载模特
     const loader = new FBXLoader();
 
@@ -78,7 +95,7 @@ export default class TattooViewer {
 
     this._scene.add(fbxModel);
 
-    fbxModel.scale.set(0.001, 0.001, 0.001);
+    fbxModel.scale.set(0.01, 0.01, 0.01);
 
     this._walkerMesh = fbxModel.children.find((object) => object instanceof THREE.Mesh)! as THREE.Mesh<
       THREE.BufferGeometry,
@@ -125,7 +142,35 @@ export default class TattooViewer {
       // TODO
       //  判断mesh
       //  阻止拖动时候触发
-      // const intersects = this._raycaster.intersectObjects(this._scene.children);
+      const intersects = this._raycaster.intersectObjects(this._scene.children);
+
+      // 判断点到了人
+      if (intersects[0]?.object.uuid === this._walkerMesh.uuid) {
+        const object = intersects[0];
+        console.log(object);
+
+        if (!this._activeTattooId) {
+          return undefined;
+        }
+
+        const activeTattooInfo = this._tattooInfoMap.get(this._activeTattooId)!;
+
+        if (activeTattooInfo.mesh) {
+          this._mouseHelper.position.copy(object.point);
+
+          const texture = new THREE.CanvasTexture(activeTattooInfo.canvas);
+
+          const material = new THREE.MeshPhongMaterial({
+            map: texture,
+            transparent: true,
+            opacity: 0.6,
+          });
+
+          // const decalGeometry = new DecalGeometry(this._walkerMesh, new THREE.Vector3().copy(object.point)),
+
+          // activeTattooInfo.mesh = new THREE.Mesh(decalGeometry, material);
+        }
+      }
     });
   };
 
@@ -133,4 +178,21 @@ export default class TattooViewer {
     requestAnimationFrame(this.animate);
     this._renderer.render(this._scene, this._camera);
   };
+
+  /**
+   * public方法
+   **/
+
+  // 新增addTattoo
+  addTattoo(canvas: HTMLCanvasElement) {
+    const id = canvas.id;
+
+    this._tattooInfoMap.set(canvas.id, {
+      id,
+      canvas,
+      mesh: null,
+    });
+
+    this._activeTattooId = id;
+  }
 }

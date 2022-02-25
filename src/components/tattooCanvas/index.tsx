@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 
 import { ITattooInfo } from "../../types";
+import { globalStore } from "../../store/viewer";
 
 interface IProps {
   info: ITattooInfo;
@@ -31,6 +32,7 @@ const TattooCanvas = ({ info }: IProps) => {
           canvas.width = img.width;
           canvas.height = img.height;
           ctx.drawImage(img, 0, 0);
+          globalStore.tattooViewer!.addTattoo(canvas);
         };
       }
     };
