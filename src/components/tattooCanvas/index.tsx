@@ -38,7 +38,7 @@ const TattooCanvas = ({ info }: IProps) => {
     };
   };
 
-  return <canvas id={info.id} ref={canvasRef} />;
+  return <canvas id={info.id} ref={canvasRef} style={{ display: "none" }} />;
 };
 
 export default TattooCanvas;
