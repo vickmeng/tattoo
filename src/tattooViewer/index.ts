@@ -2,8 +2,10 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 import { DecalGeometry } from "three/examples/jsm/geometries/DecalGeometry";
+import { throttle } from "lodash";
 import Stats from "stats.js";
 
+// import walkerFbxUrl from "./BodyMesh.fbx?url";
 import walkerFbxUrl from "./walker.fbx?url";
 
 interface IConfig {
@@ -90,7 +92,7 @@ export default class TattooViewer {
     this._scene.add(this._planeMesh);
 
     // mouseHelper
-    this._mouseHelper.visible = false;
+    // this._mouseHelper.visible = false;
     this._scene.add(this._mouseHelper);
 
     // 加载模特
@@ -125,6 +127,7 @@ export default class TattooViewer {
     this._controls = new OrbitControls(this._camera, this._renderer.domElement);
     this._controls.enablePan = false;
     // this._controls.enableZoom = false;
+    // this._controls.target.set(0, 1000, 0);
     this._controls.target.set(0, 1000, 0);
     this._controls.update();
 
@@ -216,45 +219,7 @@ export default class TattooViewer {
     //   }
     // });
 
-    window.addEventListener("pointermove", (e) => {
-      if (this._eventLock) {
-        return;
-      }
-
-      if (!this._activeTattooId) {
-        return;
-      }
-
-      // const activeTattoo = this._tattooInfoMap.get(this._activeTattooId)!;
-
-      const intersects = this.getIntersectsByMouseEvent(e);
-
-      const movedWalkerMesh = intersects.find((intersect) => (intersect.object.uuid = this._walkerMesh.uuid));
-
-      if (!movedWalkerMesh) {
-        return;
-      }
-
-      this._mouseHelper.position.copy(movedWalkerMesh.point);
-
-      const n = movedWalkerMesh.face!.normal.clone();
-      n.transformDirection(this._walkerMesh.matrixWorld);
-      n.multiplyScalar(10);
-      n.add(movedWalkerMesh.point);
-
-      this._mouseHelper.lookAt(n);
-
-      // const position = new THREE.Vector3().copy(movedWalkerMesh.point);
-      //
-      // const orientation = new THREE.Euler().copy(this._mouseHelper.rotation);
-
-      /// / activeTattoo.mesh.geometry.setAttribute("normal", position);
-      // const oldDecalGeometry = activeTattoo.mesh.geometry;
-
-      // const newDecalGeometry = new DecalGeometry(this._walkerMesh, position, orientation, oldDecalGeometry.size);
-
-      return null;
-    });
+    window.addEventListener("pointermove", this.onPointerMove);
   };
 
   private animate = () => {
@@ -263,6 +228,46 @@ export default class TattooViewer {
 
     this._state.update();
   };
+
+  private onPointerMove = throttle((e: PointerEvent) => {
+    if (this._eventLock) {
+      return;
+    }
+
+    if (!this._activeTattooId) {
+      return;
+    }
+
+    // const activeTattoo = this._tattooInfoMap.get(this._activeTattooId)!;
+
+    const intersects = this.getIntersectsByMouseEvent(e);
+
+    const movedWalkerMesh = intersects.find((intersect) => (intersect.object.uuid = this._walkerMesh.uuid));
+
+    if (!movedWalkerMesh) {
+      return;
+    }
+
+    this._mouseHelper.position.copy(movedWalkerMesh.point);
+
+    const n = movedWalkerMesh.face!.normal.clone();
+    n.transformDirection(this._walkerMesh.matrixWorld);
+    n.multiplyScalar(10);
+    n.add(movedWalkerMesh.point);
+
+    this._mouseHelper.lookAt(n);
+
+    // const position = new THREE.Vector3().copy(movedWalkerMesh.point);
+    //
+    // const orientation = new THREE.Euler().copy(this._mouseHelper.rotation);
+
+    /// / activeTattoo.mesh.geometry.setAttribute("normal", position);
+    // const oldDecalGeometry = activeTattoo.mesh.geometry;
+
+    // const newDecalGeometry = new DecalGeometry(this._walkerMesh, position, orientation, oldDecalGeometry.size);
+
+    return null;
+  }, 300);
 
   private getIntersectsByMouseEvent = (e: MouseEvent) => {
     const pointer = {
