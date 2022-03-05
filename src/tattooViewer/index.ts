@@ -17,6 +17,7 @@ interface ITattooInfo {
   id: string | number;
   canvas: HTMLCanvasElement;
   mesh: THREE.Mesh<DecalGeometry, THREE.MeshPhongMaterial>;
+  size: THREE.Vector3;
 }
 
 export default class TattooViewer {
@@ -238,8 +239,6 @@ export default class TattooViewer {
       return;
     }
 
-    // const activeTattoo = this._tattooInfoMap.get(this._activeTattooId)!;
-
     const intersects = this.getIntersectsByMouseEvent(e);
 
     const movedWalkerMesh = intersects.find((intersect) => (intersect.object.uuid = this._walkerMesh.uuid));
@@ -257,17 +256,25 @@ export default class TattooViewer {
 
     this._mouseHelper.lookAt(n);
 
-    // const position = new THREE.Vector3().copy(movedWalkerMesh.point);
+    // 移动纹身贴图
+    const activeTattoo = this._tattooInfoMap.get(this._activeTattooId)!;
+
+    const tattooMesh = activeTattoo.mesh;
+
+    tattooMesh.visible = true;
+
+    const position = new THREE.Vector3().copy(movedWalkerMesh.point);
     //
-    // const orientation = new THREE.Euler().copy(this._mouseHelper.rotation);
+    const orientation = new THREE.Euler().copy(this._mouseHelper.rotation);
 
-    /// / activeTattoo.mesh.geometry.setAttribute("normal", position);
-    // const oldDecalGeometry = activeTattoo.mesh.geometry;
+    const size = new THREE.Vector3().copy(activeTattoo.size);
 
-    // const newDecalGeometry = new DecalGeometry(this._walkerMesh, position, orientation, oldDecalGeometry.size);
+    const newDecalGeometry = new DecalGeometry(this._walkerMesh, position, orientation, size);
+
+    tattooMesh.geometry = newDecalGeometry;
 
     return null;
-  }, 300);
+  }, 100);
 
   private getIntersectsByMouseEvent = (e: MouseEvent) => {
     const pointer = {
@@ -319,6 +326,7 @@ export default class TattooViewer {
       id,
       canvas,
       mesh: tattooMesh,
+      size,
     });
 
     this._activeTattooId = id;
