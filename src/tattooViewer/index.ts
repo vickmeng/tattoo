@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 import { DecalGeometry } from "three/examples/jsm/geometries/DecalGeometry";
+import Stats from "stats.js";
 
 import walkerFbxUrl from "./walker.fbx?url";
 
@@ -13,12 +14,14 @@ interface IConfig {
 interface ITattooInfo {
   id: string | number;
   canvas: HTMLCanvasElement;
-  mesh: THREE.Mesh | null;
+  mesh: THREE.Mesh<DecalGeometry, THREE.MeshPhongMaterial>;
 }
 
 export default class TattooViewer {
   private readonly _container!: HTMLElement;
   private readonly _canvas!: HTMLCanvasElement;
+
+  private readonly _state = new Stats();
 
   private readonly _scene = new THREE.Scene();
   private _renderer!: THREE.WebGLRenderer;
@@ -42,7 +45,7 @@ export default class TattooViewer {
 
   private _activeTattooId: string | null = null;
 
-  private _mouseHelper = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 100), new THREE.MeshNormalMaterial());
+  private _mouseHelper = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 10), new THREE.MeshNormalMaterial());
 
   private _raycaster = new THREE.Raycaster();
 
@@ -109,8 +112,6 @@ export default class TattooViewer {
     // 计算法线
     this._walkerMesh.geometry.computeVertexNormals();
 
-    // console.log(this._walkerMesh);
-
     // 渲染器
     this._renderer = new THREE.WebGLRenderer({ canvas: this._canvas, antialias: true });
     this._renderer.shadowMap.enabled = true;
@@ -131,6 +132,9 @@ export default class TattooViewer {
       this._eventLock = true;
     });
 
+    // stats
+    this._container.appendChild(this._state.dom);
+
     // 开启动画
     this.animate();
   };
@@ -138,70 +142,126 @@ export default class TattooViewer {
   // 捆绑拾取
 
   private bindEvent = () => {
-    window.addEventListener("mousedown", (e) => {
+    window.addEventListener("pointerdown", (e) => {
       this._eventLock = false;
     });
 
-    window.addEventListener("mouseup", (e) => {
+    // window.addEventListener("pointerup", (e) => {
+    //   if (this._eventLock) {
+    //     return;
+    //   }
+    //   const intersects = this.getIntersectsByMouseEvent(e);
+    //
+    //   const clickedTattooMesh = intersects.find((intersect) => {
+    //     return this._tattooInfoMap.get(intersect.object.uuid);
+    //   });
+    //
+    //   const clickedWalkerMesh = intersects.find((intersect) => {
+    //     return (intersect.object.uuid = this._walkerMesh.uuid);
+    //   });
+    //
+    //   if (!clickedWalkerMesh) {
+    //     return;
+    //   }
+    //
+    //   // 如果有active的纹身
+    //   if (this._activeTattooId) {
+    //     const activeTattooInfo = this._tattooInfoMap.get(this._activeTattooId!)!;
+    //
+    //     if (activeTattooInfo.mesh) {
+    //       // 如果active的纹身,有mesh，则取消纹身选中状态
+    //     } else {
+    //       // 如果active的纹身,没有mesh，则添加mesh
+    //       // if (clickedWalkerMesh) {
+    //       //   const object = intersects[0];
+    //       //
+    //       //   const activeTattooInfo = this._tattooInfoMap.get(this._activeTattooId!)!;
+    //       //
+    //       //   if (activeTattooInfo && !activeTattooInfo.mesh) {
+    //       //     this._mouseHelper.position.copy(object.point);
+    //       //
+    //       //     const n = object.face!.normal.clone();
+    //       //     n.transformDirection(this._walkerMesh.matrixWorld);
+    //       //     n.multiplyScalar(100);
+    //       //     n.add(object.point);
+    //       //
+    //       //     this._mouseHelper.lookAt(n);
+    //       //
+    //       //     // const position = new THREE.Vector3().copy(object.point);
+    //       //     //
+    //       //     // const orientation = new THREE.Euler().copy(this._mouseHelper.rotation);
+    //       //     //
+    //       //     // // TODO 没能正确的理解size的z，目前已知z不涉及尺寸，与平面法向量点积有关
+    //       //     // const size = new THREE.Vector3(324, 405, 200);
+    //       //     //
+    //       //     // const decalGeometry = new DecalGeometry(this._walkerMesh, position, orientation, size);
+    //       //     //
+    //       //     // const texture = new THREE.CanvasTexture(activeTattooInfo.canvas);
+    //       //     //
+    //       //     // const material = new THREE.MeshPhongMaterial({
+    //       //     //   map: texture,
+    //       //     //   transparent: true,
+    //       //     //   opacity: 0.8,
+    //       //     // });
+    //       //     //
+    //       //     // const tattooMesh = new THREE.Mesh(decalGeometry, material);
+    //       //     //
+    //       //     // this._scene.add(tattooMesh);
+    //       //
+    //       //     // activeTattooInfo.mesh = tattooMesh;
+    //       //   }
+    //       // }
+    //     }
+    //     return undefined;
+    //   }
+    // });
+
+    window.addEventListener("pointermove", (e) => {
       if (this._eventLock) {
         return;
       }
+
+      if (!this._activeTattooId) {
+        return;
+      }
+
+      // const activeTattoo = this._tattooInfoMap.get(this._activeTattooId)!;
+
       const intersects = this.getIntersectsByMouseEvent(e);
 
-      // 如果有active的纹身
-      if (this._activeTattooId) {
-        // 如果active的纹身没有mesh，则添加mesh
-        // 如果active的纹身有mesh，则取消纹身选中状态
-        if (intersects[0]?.object.uuid === this._walkerMesh.uuid) {
-          const object = intersects[0];
+      const movedWalkerMesh = intersects.find((intersect) => (intersect.object.uuid = this._walkerMesh.uuid));
 
-          const activeTattooInfo = this._tattooInfoMap.get(this._activeTattooId!)!;
-
-          if (activeTattooInfo && !activeTattooInfo.mesh) {
-            this._mouseHelper.position.copy(object.point);
-
-            const n = object.face!.normal.clone();
-            n.transformDirection(this._walkerMesh.matrixWorld);
-            n.multiplyScalar(100);
-            n.add(object.point);
-
-            this._mouseHelper.lookAt(n);
-
-            const position = new THREE.Vector3().copy(object.point);
-
-            const orientation = new THREE.Euler().copy(this._mouseHelper.rotation);
-
-            // TODO 没能正确的理解size的z，目前已知z不涉及尺寸，与平面法向量点积有关
-            const size = new THREE.Vector3(324, 405, 200);
-
-            const decalGeometry = new DecalGeometry(this._walkerMesh, position, orientation, size);
-
-            const texture = new THREE.CanvasTexture(activeTattooInfo.canvas);
-            texture.repeat.set(1, 1);
-
-            const material = new THREE.MeshPhongMaterial({
-              map: texture,
-              transparent: true,
-              opacity: 0.8,
-            });
-
-            const tattooMesh = new THREE.Mesh(decalGeometry, material);
-
-            this._scene.add(tattooMesh);
-
-            activeTattooInfo.mesh = tattooMesh;
-          }
-        }
-        return undefined;
-      } else {
-        // 判断直接点到了人
+      if (!movedWalkerMesh) {
+        return;
       }
+
+      this._mouseHelper.position.copy(movedWalkerMesh.point);
+
+      const n = movedWalkerMesh.face!.normal.clone();
+      n.transformDirection(this._walkerMesh.matrixWorld);
+      n.multiplyScalar(10);
+      n.add(movedWalkerMesh.point);
+
+      this._mouseHelper.lookAt(n);
+
+      // const position = new THREE.Vector3().copy(movedWalkerMesh.point);
+      //
+      // const orientation = new THREE.Euler().copy(this._mouseHelper.rotation);
+
+      /// / activeTattoo.mesh.geometry.setAttribute("normal", position);
+      // const oldDecalGeometry = activeTattoo.mesh.geometry;
+
+      // const newDecalGeometry = new DecalGeometry(this._walkerMesh, position, orientation, oldDecalGeometry.size);
+
+      return null;
     });
   };
 
   private animate = () => {
     requestAnimationFrame(this.animate);
     this._renderer.render(this._scene, this._camera);
+
+    this._state.update();
   };
 
   private getIntersectsByMouseEvent = (e: MouseEvent) => {
@@ -225,10 +285,35 @@ export default class TattooViewer {
   addTattoo(canvas: HTMLCanvasElement) {
     const id = canvas.id;
 
+    const position = new THREE.Vector3();
+
+    const orientation = new THREE.Euler();
+
+    // TODO 没能正确的理解size的z，目前已知z不涉及尺寸，与平面法向量点积有关
+    const size = new THREE.Vector3(324, 405, 200);
+
+    const decalGeometry = new DecalGeometry(this._walkerMesh, position, orientation, size);
+
+    const texture = new THREE.CanvasTexture(canvas);
+
+    const material = new THREE.MeshPhongMaterial({
+      map: texture,
+      transparent: true,
+      opacity: 0.8,
+    });
+
+    const tattooMesh = new THREE.Mesh(decalGeometry, material);
+
+    console.log(decalGeometry);
+
+    tattooMesh.visible = false;
+
+    this._scene.add(tattooMesh);
+
     this._tattooInfoMap.set(canvas.id, {
       id,
       canvas,
-      mesh: null,
+      mesh: tattooMesh,
     });
 
     this._activeTattooId = id;

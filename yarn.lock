@@ -337,6 +337,11 @@
   resolved "http://npm.yzw.cn/@types%2fscheduler/-/scheduler-0.16.2.tgz#1a62f89525723dde24ba1b01b092bf5df8ad4d39"
   integrity sha1-GmL4lSVyPd4kuhsBsJK/XfitTTk=
 
+"@types/stats.js@^0.17.0":
+  version "0.17.0"
+  resolved "http://npm.yzw.cn/@types%2fstats.js/-/stats.js-0.17.0.tgz#0ed81d48e03b590c24da85540c1d952077a9fe20"
+  integrity sha1-DtgdSOA7WQwk2oVUDB2VIHep/iA=
+
 "@types/three@^0.136.1":
   version "0.136.1"
   resolved "http://npm.yzw.cn/@types%2fthree/-/three-0.136.1.tgz#030fc01cdc5ce82cad93db17b94a24515cb4b50e"
@@ -1991,6 +1996,11 @@ sprintf-js@~1.0.2:
   version "1.0.3"
   resolved "http://npm.yzw.cn/sprintf-js/-/sprintf-js-1.0.3.tgz#04e6926f662895354f3dd015203633b857297e2c"
   integrity sha1-BOaSb2YolTVPPdAVIDYzuFcpfiw=
+
+stats.js@^0.17.0:
+  version "0.17.0"
+  resolved "http://npm.yzw.cn/stats.js/-/stats.js-0.17.0.tgz#b1c3dc46d94498b578b7fd3985b81ace7131cc7d"
+  integrity sha1-scPcRtlEmLV4t/05hbgaznExzH0=
 
 string-width@^4.2.3:
   version "4.2.3"
