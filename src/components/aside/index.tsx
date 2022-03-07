@@ -2,9 +2,8 @@ import { useRecoilState } from "recoil";
 import { v4 as uuidv4 } from "uuid";
 
 import { tattooFilesInfoAtom } from "../../store/tattooFiles";
-
-import "./index.css";
 import TattooCanvas from "../tattooCanvas";
+import "./index.css";
 
 const Aside = () => {
   const [tattooFilesInfo, setTattooFilesInfo] = useRecoilState(tattooFilesInfoAtom);
@@ -14,6 +13,10 @@ const Aside = () => {
       <div>
         {tattooFilesInfo.map((fileInfo) => {
           return <TattooCanvas info={fileInfo} key={fileInfo.id} />;
+        })}
+
+        {tattooFilesInfo.map((fileInfo) => {
+          return <p key={fileInfo.id}>{fileInfo.id}</p>;
         })}
       </div>
 

@@ -150,75 +150,9 @@ export default class TattooViewer {
       this._eventLock = false;
     });
 
-    // window.addEventListener("pointerup", (e) => {
-    //   if (this._eventLock) {
-    //     return;
-    //   }
-    //   const intersects = this.getIntersectsByMouseEvent(e);
-    //
-    //   const clickedTattooMesh = intersects.find((intersect) => {
-    //     return this._tattooInfoMap.get(intersect.object.uuid);
-    //   });
-    //
-    //   const clickedWalkerMesh = intersects.find((intersect) => {
-    //     return (intersect.object.uuid = this._walkerMesh.uuid);
-    //   });
-    //
-    //   if (!clickedWalkerMesh) {
-    //     return;
-    //   }
-    //
-    //   // 如果有active的纹身
-    //   if (this._activeTattooId) {
-    //     const activeTattooInfo = this._tattooInfoMap.get(this._activeTattooId!)!;
-    //
-    //     if (activeTattooInfo.mesh) {
-    //       // 如果active的纹身,有mesh，则取消纹身选中状态
-    //     } else {
-    //       // 如果active的纹身,没有mesh，则添加mesh
-    //       // if (clickedWalkerMesh) {
-    //       //   const object = intersects[0];
-    //       //
-    //       //   const activeTattooInfo = this._tattooInfoMap.get(this._activeTattooId!)!;
-    //       //
-    //       //   if (activeTattooInfo && !activeTattooInfo.mesh) {
-    //       //     this._mouseHelper.position.copy(object.point);
-    //       //
-    //       //     const n = object.face!.normal.clone();
-    //       //     n.transformDirection(this._walkerMesh.matrixWorld);
-    //       //     n.multiplyScalar(100);
-    //       //     n.add(object.point);
-    //       //
-    //       //     this._mouseHelper.lookAt(n);
-    //       //
-    //       //     // const position = new THREE.Vector3().copy(object.point);
-    //       //     //
-    //       //     // const orientation = new THREE.Euler().copy(this._mouseHelper.rotation);
-    //       //     //
-    //       //     // // TODO 没能正确的理解size的z，目前已知z不涉及尺寸，与平面法向量点积有关
-    //       //     // const size = new THREE.Vector3(324, 405, 200);
-    //       //     //
-    //       //     // const decalGeometry = new DecalGeometry(this._walkerMesh, position, orientation, size);
-    //       //     //
-    //       //     // const texture = new THREE.CanvasTexture(activeTattooInfo.canvas);
-    //       //     //
-    //       //     // const material = new THREE.MeshPhongMaterial({
-    //       //     //   map: texture,
-    //       //     //   transparent: true,
-    //       //     //   opacity: 0.8,
-    //       //     // });
-    //       //     //
-    //       //     // const tattooMesh = new THREE.Mesh(decalGeometry, material);
-    //       //     //
-    //       //     // this._scene.add(tattooMesh);
-    //       //
-    //       //     // activeTattooInfo.mesh = tattooMesh;
-    //       //   }
-    //       // }
-    //     }
-    //     return undefined;
-    //   }
-    // });
+    window.addEventListener("pointerup", (e) => {
+      this._eventLock = false;
+    });
 
     window.addEventListener("pointermove", this.onPointerMove);
   };
@@ -315,8 +249,6 @@ export default class TattooViewer {
     });
 
     const tattooMesh = new THREE.Mesh(decalGeometry, material);
-
-    console.log(decalGeometry);
 
     tattooMesh.visible = false;
 
