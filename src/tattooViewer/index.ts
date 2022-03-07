@@ -153,7 +153,15 @@ export default class TattooViewer {
     window.addEventListener("pointerup", (e) => {
       this._eventLock = false;
       if (this._activeTattooId) {
-        this.clearActiveTattoo();
+        const intersects = this.getIntersectsByMouseEvent(e);
+
+        const walkerIntersect = intersects.find((intersect) => intersect.object.uuid === this._walkerMesh.uuid);
+
+        if (!walkerIntersect) {
+          return;
+        }
+
+        this.onMoveActiveTattoo(walkerIntersect);
       }
     });
 
@@ -167,7 +175,7 @@ export default class TattooViewer {
     this._state.update();
   };
 
-  private onPointerMove = throttle((e: PointerEvent) => {
+  private onPointerMove = (e: PointerEvent) => {
     if (this._eventLock) {
       return;
     }
@@ -181,19 +189,16 @@ export default class TattooViewer {
       return;
     }
 
-    if (this._activeTattooId) {
-      this.onMoveActiveTattoo(intersects);
-    } else {
-      const tattooId = this.getPointedTattooIdFromIntersects(intersects);
+    const tattooId = this.getPointedTattooIdFromIntersects(intersects);
 
-      if (tattooId) {
-        console.log(`滑中id为${tattooId}的纹身`);
-        this.highLightTattoo(tattooId);
-      } else {
-        this.clearTattooHighLight();
-      }
+    if (tattooId) {
+      // eslint-disable-next-line no-console
+      console.log(`滑中id为${tattooId}的纹身`);
+      this.highLightTattoo(tattooId);
+    } else {
+      this.clearTattooHighLight();
     }
-  }, 100);
+  };
 
   // TODO 效果不好
   private highLightTattoo = (id: string) => {
@@ -213,19 +218,13 @@ export default class TattooViewer {
     });
   };
 
-  private onMoveActiveTattoo = (intersects: THREE.Intersection[]) => {
-    const movedWalkerMesh = intersects.find((intersect) => intersect.object.uuid === this._walkerMesh.uuid);
+  private onMoveActiveTattoo = (walkerIntersect: THREE.Intersection) => {
+    this._mouseHelper.position.copy(walkerIntersect.point);
 
-    if (!movedWalkerMesh) {
-      return;
-    }
-
-    this._mouseHelper.position.copy(movedWalkerMesh.point);
-
-    const n = movedWalkerMesh.face!.normal.clone();
+    const n = walkerIntersect.face!.normal.clone();
     n.transformDirection(this._walkerMesh.matrixWorld);
     n.multiplyScalar(10);
-    n.add(movedWalkerMesh.point);
+    n.add(walkerIntersect.point);
 
     this._mouseHelper.lookAt(n);
 
@@ -236,7 +235,7 @@ export default class TattooViewer {
 
     tattooMesh.visible = true;
 
-    const position = new THREE.Vector3().copy(movedWalkerMesh.point);
+    const position = new THREE.Vector3().copy(walkerIntersect.point);
     //
     const orientation = new THREE.Euler().copy(this._mouseHelper.rotation);
 
