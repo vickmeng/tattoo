@@ -2,7 +2,6 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 import { DecalGeometry } from "three/examples/jsm/geometries/DecalGeometry";
-import { throttle } from "lodash";
 import Stats from "stats.js";
 
 // import walkerFbxUrl from "./BodyMesh.fbx?url";
@@ -158,6 +157,7 @@ export default class TattooViewer {
         const walkerIntersect = intersects.find((intersect) => intersect.object.uuid === this._walkerMesh.uuid);
 
         if (!walkerIntersect) {
+          // 没点中人
           return;
         }
 
