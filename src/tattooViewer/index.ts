@@ -152,6 +152,9 @@ export default class TattooViewer {
 
     window.addEventListener("pointerup", (e) => {
       this._eventLock = false;
+      if (this._activeTattooId) {
+        this.clearActiveTattoo();
+      }
     });
 
     window.addEventListener("pointermove", this.onPointerMove);
@@ -169,13 +172,49 @@ export default class TattooViewer {
       return;
     }
 
-    if (!this._activeTattooId) {
+    const intersects = this.getIntersectsByMouseEvent(e);
+
+    const isPointingOnWalker = intersects.some((intersect) => intersect.object.uuid === this._walkerMesh.uuid);
+
+    if (!isPointingOnWalker) {
+      this.clearTattooHighLight();
       return;
     }
 
-    const intersects = this.getIntersectsByMouseEvent(e);
+    if (this._activeTattooId) {
+      this.onMoveActiveTattoo(intersects);
+    } else {
+      const tattooId = this.getPointedTattooIdFromIntersects(intersects);
 
-    const movedWalkerMesh = intersects.find((intersect) => (intersect.object.uuid = this._walkerMesh.uuid));
+      if (tattooId) {
+        console.log(`滑中id为${tattooId}的纹身`);
+        this.highLightTattoo(tattooId);
+      } else {
+        this.clearTattooHighLight();
+      }
+    }
+  }, 100);
+
+  // TODO 效果不好
+  private highLightTattoo = (id: string) => {
+    this._tattooInfoMap.forEach((tattoo) => {
+      if (tattoo.mesh.uuid === id) {
+        tattoo.mesh.material.opacity = 1;
+      } else {
+        tattoo.mesh.material.opacity = 0.2;
+      }
+    });
+  };
+
+  // TODO 效果不好
+  private clearTattooHighLight = () => {
+    this._tattooInfoMap.forEach((tattoo) => {
+      tattoo.mesh.material.opacity = 0.6;
+    });
+  };
+
+  private onMoveActiveTattoo = (intersects: THREE.Intersection[]) => {
+    const movedWalkerMesh = intersects.find((intersect) => intersect.object.uuid === this._walkerMesh.uuid);
 
     if (!movedWalkerMesh) {
       return;
@@ -191,7 +230,7 @@ export default class TattooViewer {
     this._mouseHelper.lookAt(n);
 
     // 移动纹身贴图
-    const activeTattoo = this._tattooInfoMap.get(this._activeTattooId)!;
+    const activeTattoo = this._tattooInfoMap.get(this._activeTattooId!)!;
 
     const tattooMesh = activeTattoo.mesh;
 
@@ -206,9 +245,7 @@ export default class TattooViewer {
     const newDecalGeometry = new DecalGeometry(this._walkerMesh, position, orientation, size);
 
     tattooMesh.geometry = newDecalGeometry;
-
-    return null;
-  }, 100);
+  };
 
   private getIntersectsByMouseEvent = (e: MouseEvent) => {
     const pointer = {
@@ -221,6 +258,10 @@ export default class TattooViewer {
     const intersects = this._raycaster.intersectObjects(this._scene.children);
 
     return intersects;
+  };
+
+  private getPointedTattooIdFromIntersects = (intersects: THREE.Intersection[]) => {
+    return intersects.find((intersect) => this._tattooInfoMap.get(intersect.object.uuid))?.object?.uuid;
   };
 
   /**
@@ -245,10 +286,12 @@ export default class TattooViewer {
     const material = new THREE.MeshPhongMaterial({
       map: texture,
       transparent: true,
-      opacity: 0.8,
+      opacity: 0.6,
     });
 
     const tattooMesh = new THREE.Mesh(decalGeometry, material);
+
+    tattooMesh.uuid = id;
 
     tattooMesh.visible = false;
 
@@ -261,6 +304,15 @@ export default class TattooViewer {
       size,
     });
 
+    this.markTattooAsActive(id);
+  }
+
+  markTattooAsActive(id: string) {
     this._activeTattooId = id;
+    this.highLightTattoo(id);
+  }
+
+  clearActiveTattoo() {
+    this._activeTattooId = null;
   }
 }
