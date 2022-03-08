@@ -1,11 +1,15 @@
 import * as THREE from "three";
+import { computeBoundsTree, disposeBoundsTree, acceleratedRaycast } from "three-mesh-bvh";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 import { DecalGeometry } from "three/examples/jsm/geometries/DecalGeometry";
 import Stats from "stats.js";
 
-// import walkerFbxUrl from "./BodyMesh.fbx?url";
 import walkerFbxUrl from "./walker.fbx?url";
+
+THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
+THREE.BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree;
+THREE.Mesh.prototype.raycast = acceleratedRaycast;
 
 interface IConfig {
   container: HTMLElement;
@@ -111,6 +115,8 @@ export default class TattooViewer {
 
     this._walkerMesh.material.color.setHex(0xffdbac);
 
+    this._walkerMesh.geometry.computeBoundsTree();
+
     // 计算法线
     this._walkerMesh.geometry.computeVertexNormals();
 
@@ -122,6 +128,9 @@ export default class TattooViewer {
     this._renderer.outputEncoding = THREE.sRGBEncoding;
     this._renderer.shadowMap.enabled = true;
     this._container.appendChild(this._renderer.domElement);
+
+    // 投射
+    this._raycaster.firstHitOnly = true;
 
     // 控制器
     this._controls = new OrbitControls(this._camera, this._renderer.domElement);
