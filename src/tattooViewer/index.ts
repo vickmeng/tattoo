@@ -131,7 +131,6 @@ export default class TattooViewer {
 
     // 投射
     this._raycaster.firstHitOnly = true;
-
     // 控制器
     this._controls = new OrbitControls(this._camera, this._renderer.domElement);
     this._controls.enablePan = false;
@@ -152,21 +151,25 @@ export default class TattooViewer {
   };
 
   // 捆绑拾取
-
   private bindEvent = () => {
-    window.addEventListener("pointerdown", (e) => {
+    this._container.addEventListener("pointerdown", (e) => {
       this._eventLock = false;
     });
 
-    window.addEventListener("pointerup", (e) => {
-      this._eventLock = false;
+    this._container.addEventListener("pointermove", this.onPointerMove);
+
+    this._container.addEventListener("pointerup", (e) => {
+      if (this._eventLock) {
+        this._eventLock = false;
+        return;
+      }
+
       if (this._activeTattooId) {
         const intersects = this.getIntersectsByMouseEvent(e);
 
         const walkerIntersect = intersects.find((intersect) => intersect.object.uuid === this._walkerMesh.uuid);
 
         if (!walkerIntersect) {
-          // 没点中人
           return;
         }
 
@@ -174,7 +177,11 @@ export default class TattooViewer {
       }
     });
 
-    window.addEventListener("pointermove", this.onPointerMove);
+    window.addEventListener("keyup", (e) => {
+      if (e.key === "Backspace") {
+        this.clearActiveTattoo();
+      }
+    });
   };
 
   private animate = () => {
@@ -191,21 +198,23 @@ export default class TattooViewer {
 
     const intersects = this.getIntersectsByMouseEvent(e);
 
-    const isPointingOnWalker = intersects.some((intersect) => intersect.object.uuid === this._walkerMesh.uuid);
+    const walkerIntersect = intersects.find((intersect) => intersect.object.uuid === this._walkerMesh.uuid);
 
-    if (!isPointingOnWalker) {
+    if (!walkerIntersect) {
       this.clearTattooHighLight();
       return;
     }
 
-    const tattooId = this.getPointedTattooIdFromIntersects(intersects);
-
-    if (tattooId) {
-      // eslint-disable-next-line no-console
-      console.log(`滑中id为${tattooId}的纹身`);
-      this.highLightTattoo(tattooId);
+    if (this._activeTattooId) {
+      //
     } else {
-      this.clearTattooHighLight();
+      const tattooId = this.getPointedTattooIdFromIntersects(intersects);
+
+      if (tattooId) {
+        this.highLightTattoo(tattooId);
+      } else {
+        this.clearTattooHighLight();
+      }
     }
   };
 
@@ -263,7 +272,7 @@ export default class TattooViewer {
 
     this._raycaster.setFromCamera(pointer, this._camera);
 
-    const intersects = this._raycaster.intersectObjects(this._scene.children);
+    const intersects = this._raycaster.intersectObjects(this._scene.children, true);
 
     return intersects;
   };
