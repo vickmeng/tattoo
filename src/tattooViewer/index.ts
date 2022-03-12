@@ -140,11 +140,6 @@ export default class TattooViewer {
     this._controls.target.set(0, 1000, 0);
     this._controls.update();
 
-    this._controls.addEventListener("change", (e) => {
-      // console.log("change");
-      // this._eventLock = true;
-    });
-
     // stats
     this._container.appendChild(this._state.dom);
 
@@ -154,23 +149,13 @@ export default class TattooViewer {
 
   // 捆绑拾取
   private bindEvent = () => {
-    this._container.addEventListener("pointerdown", (e) => {
-      // this._eventLock = false;
-    });
+    this._container.addEventListener("pointerdown", (e) => {});
 
     this._container.addEventListener("pointermove", this.onPointerMove);
 
     this._container.addEventListener("pointerup", (e) => {
-      // console.log("pointerup==", this._eventLock);
-      //
-      // if (this._eventLock) {
-      //   this._eventLock = false;
-      //   return;
-      // }
-
       const intersects = this.getIntersectsByMouseEvent(e);
 
-      // console.log(this._activeTattooId, "==");
       if (this._activeTattooId) {
         const walkerIntersect = intersects.find((intersect) => intersect.object.uuid === this._walkerMesh.uuid);
 
@@ -183,7 +168,6 @@ export default class TattooViewer {
         const tattooId = this.getPointedTattooIdFromIntersects(intersects);
         if (tattooId) {
           this.markTattooAsActive(tattooId);
-          // this._activeTattooId = tattooId;
         }
       }
     });
