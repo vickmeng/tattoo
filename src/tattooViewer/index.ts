@@ -187,10 +187,6 @@ export default class TattooViewer {
   };
 
   private onPointerMove = (e: PointerEvent) => {
-    // if (this._eventLock) {
-    //   return;
-    // }
-
     const intersects = this.getIntersectsByMouseEvent(e);
 
     const walkerIntersect = intersects.find((intersect) => intersect.object.uuid === this._walkerMesh.uuid);
@@ -200,9 +196,7 @@ export default class TattooViewer {
       return;
     }
 
-    if (this._activeTattooId) {
-      //
-    } else {
+    if (!this._activeTattooId) {
       const tattooId = this.getPointedTattooIdFromIntersects(intersects);
 
       if (tattooId) {
