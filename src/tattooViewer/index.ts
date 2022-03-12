@@ -56,7 +56,7 @@ export default class TattooViewer {
 
   private _raycaster = new THREE.Raycaster();
 
-  private _eventLock = false;
+  // private _eventLock = false;
 
   constructor({ container, canvas }: IConfig) {
     this._canvas = canvas;
@@ -141,7 +141,8 @@ export default class TattooViewer {
     this._controls.update();
 
     this._controls.addEventListener("change", (e) => {
-      this._eventLock = true;
+      // console.log("change");
+      // this._eventLock = true;
     });
 
     // stats
@@ -154,21 +155,23 @@ export default class TattooViewer {
   // 捆绑拾取
   private bindEvent = () => {
     this._container.addEventListener("pointerdown", (e) => {
-      this._eventLock = false;
+      // this._eventLock = false;
     });
 
     this._container.addEventListener("pointermove", this.onPointerMove);
 
     this._container.addEventListener("pointerup", (e) => {
-      if (this._eventLock) {
-        this._eventLock = false;
-        return;
-      }
+      // console.log("pointerup==", this._eventLock);
+      //
+      // if (this._eventLock) {
+      //   this._eventLock = false;
+      //   return;
+      // }
 
       const intersects = this.getIntersectsByMouseEvent(e);
 
+      // console.log(this._activeTattooId, "==");
       if (this._activeTattooId) {
-        console.log(this._activeTattooId);
         const walkerIntersect = intersects.find((intersect) => intersect.object.uuid === this._walkerMesh.uuid);
 
         if (!walkerIntersect) {
@@ -186,7 +189,7 @@ export default class TattooViewer {
     });
 
     window.addEventListener("keyup", (e) => {
-      if (e.key === "Backspace") {
+      if (e.key === "Escape") {
         this.clearActiveTattoo();
       }
     });
@@ -200,9 +203,9 @@ export default class TattooViewer {
   };
 
   private onPointerMove = (e: PointerEvent) => {
-    if (this._eventLock) {
-      return;
-    }
+    // if (this._eventLock) {
+    //   return;
+    // }
 
     const intersects = this.getIntersectsByMouseEvent(e);
 
