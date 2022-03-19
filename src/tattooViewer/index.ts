@@ -188,7 +188,26 @@ export default class TattooViewer {
     window.addEventListener("keyup", (e) => {
       if (e.key === "Escape") {
         this.clearActiveTattoo();
+        return;
       }
+      if (e.key === "Backspace") {
+        if (this._activeTattooId) {
+          this.removeTattoo(this._activeTattooId);
+        }
+      }
+      if (e.key === "a") {
+        if (this._activeTattooId) {
+          // this.removeTattoo(this._activeTattooId);
+        }
+      }
+
+      if (e.key === "b") {
+        if (this._activeTattooId) {
+          // this.removeTattoo(this._activeTattooId);
+        }
+      }
+
+      // console.log(e.key);
     });
   };
 
@@ -344,6 +363,14 @@ export default class TattooViewer {
     });
 
     this.markTattooAsActive(id);
+  }
+
+  removeTattoo(id: string) {
+    const targetTattoo = this._tattooInfoMap.get(id);
+    if (targetTattoo) {
+      this._scene.remove(targetTattoo.mesh, targetTattoo.outlineMesh);
+      this._tattooInfoMap.delete(id);
+    }
   }
 
   markTattooAsActive(id: string) {
