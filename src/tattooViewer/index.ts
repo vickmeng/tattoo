@@ -192,20 +192,21 @@ export default class TattooViewer {
       }
       if (e.key === "Backspace") {
         if (this._activeTattooId) {
-          this.removeTattoo(this._activeTattooId);
+          this._onRemoveTattoo(this._activeTattooId);
         }
       }
-      if (e.key === "a") {
-        if (this._activeTattooId) {
-          // this.removeTattoo(this._activeTattooId);
-        }
-      }
-
-      if (e.key === "b") {
-        if (this._activeTattooId) {
-          // this.removeTattoo(this._activeTattooId);
-        }
-      }
+      // if (e.key === "a") {
+      //   if (this._activeTattooId) {
+      //     this._rotateBackTattoo(this._activeTattooId);
+      //     // this.removeTattoo(this._activeTattooId);
+      //   }
+      // }
+      //
+      // if (e.key === "b") {
+      //   if (this._activeTattooId) {
+      //     // this.removeTattoo(this._activeTattooId);
+      //   }
+      // }
 
       // console.log(e.key);
     });
@@ -314,6 +315,14 @@ export default class TattooViewer {
     return intersects.find((intersect) => this._tattooInfoMap.get(intersect.object.uuid))?.object?.uuid;
   };
 
+  private _onRemoveTattoo(id: string) {
+    const targetTattoo = this._tattooInfoMap.get(id);
+    if (targetTattoo) {
+      this._scene.remove(targetTattoo.mesh, targetTattoo.outlineMesh);
+      this._tattooInfoMap.delete(id);
+    }
+  }
+
   /**
    * public方法
    **/
@@ -363,14 +372,6 @@ export default class TattooViewer {
     });
 
     this.markTattooAsActive(id);
-  }
-
-  removeTattoo(id: string) {
-    const targetTattoo = this._tattooInfoMap.get(id);
-    if (targetTattoo) {
-      this._scene.remove(targetTattoo.mesh, targetTattoo.outlineMesh);
-      this._tattooInfoMap.delete(id);
-    }
   }
 
   markTattooAsActive(id: string) {
