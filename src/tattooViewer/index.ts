@@ -52,10 +52,22 @@ export default class TattooViewer {
 
   private _activeTattooId: string | null = null;
 
-  private _mouseHelper = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 10), new THREE.MeshNormalMaterial());
+  private _mouseHelper = new THREE.Mesh(
+    new THREE.BoxGeometry(1, 1, 180),
+    new THREE.MeshBasicMaterial({ color: 0xff0000 })
+  );
 
   private _raycaster = new THREE.Raycaster();
 
+  private _switchMouseHelperVisible = (visible: boolean) => {
+    if (visible) {
+      this._mouseHelper.visible = true;
+      this._container.style.cursor = "none";
+    } else {
+      this._mouseHelper.visible = false;
+      this._container.style.cursor = "inherit";
+    }
+  };
   // private _eventLock = false;
 
   constructor({ container, canvas }: IConfig) {
@@ -96,8 +108,9 @@ export default class TattooViewer {
     this._planeMesh.receiveShadow = true;
     this._scene.add(this._planeMesh);
 
+    //
     // mouseHelper
-    // this._mouseHelper.visible = false;
+    this._mouseHelper.visible = false;
     this._scene.add(this._mouseHelper);
 
     // 加载模特
@@ -191,19 +204,21 @@ export default class TattooViewer {
 
     const walkerIntersect = intersects.find((intersect) => intersect.object.uuid === this._walkerMesh.uuid);
 
-    if (!walkerIntersect) {
-      this.clearPointedTattooHighLight();
-      return;
-    }
+    if (walkerIntersect) {
+      this._switchMouseHelperVisible(true);
+      this.moveMouseHelper(walkerIntersect);
+      if (!this._activeTattooId) {
+        const tattooId = this.getPointedTattooIdFromIntersects(intersects);
 
-    if (!this._activeTattooId) {
-      const tattooId = this.getPointedTattooIdFromIntersects(intersects);
-
-      if (tattooId) {
-        this.highLightPointedTattoo(tattooId);
-      } else {
-        this.clearPointedTattooHighLight();
+        if (tattooId) {
+          this.highLightPointedTattoo(tattooId);
+        } else {
+          this.clearPointedTattooHighLight();
+        }
       }
+    } else {
+      this._switchMouseHelperVisible(false);
+      this.clearPointedTattooHighLight();
     }
   };
 
@@ -227,14 +242,7 @@ export default class TattooViewer {
   };
 
   private onMoveActiveTattoo = (walkerIntersect: THREE.Intersection) => {
-    this._mouseHelper.position.copy(walkerIntersect.point);
-
-    const n = walkerIntersect.face!.normal.clone();
-    n.transformDirection(this._walkerMesh.matrixWorld);
-    n.multiplyScalar(10);
-    n.add(walkerIntersect.point);
-
-    this._mouseHelper.lookAt(n);
+    this.moveMouseHelper(walkerIntersect);
 
     // 移动纹身贴图
     const activeTattoo = this._tattooInfoMap.get(this._activeTattooId!)!;
@@ -244,7 +252,7 @@ export default class TattooViewer {
     tattooMesh.visible = true;
 
     const position = new THREE.Vector3().copy(walkerIntersect.point);
-    //
+
     const orientation = new THREE.Euler().copy(this._mouseHelper.rotation);
 
     const size = new THREE.Vector3().copy(activeTattoo.size);
@@ -258,6 +266,16 @@ export default class TattooViewer {
 
     const outlineGeometry = new DecalGeometry(this._walkerMesh, position, orientation, new THREE.Vector3().copy(size));
     outlineMesh.geometry = outlineGeometry;
+  };
+
+  private moveMouseHelper = (walkerIntersect: THREE.Intersection) => {
+    this._mouseHelper.position.copy(walkerIntersect.point);
+    const n = walkerIntersect.face!.normal.clone();
+    n.transformDirection(this._walkerMesh.matrixWorld);
+    n.multiplyScalar(10);
+    n.add(walkerIntersect.point);
+
+    this._mouseHelper.lookAt(n);
   };
 
   private getIntersectsByMouseEvent = (e: MouseEvent) => {
