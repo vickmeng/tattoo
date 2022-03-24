@@ -68,6 +68,14 @@ export default class TattooViewer {
       this._container.style.cursor = "inherit";
     }
   };
+
+  private _onRemoveTattoo = (id: string) => {
+    const targetTattoo = this._tattooInfoMap.get(id);
+    if (targetTattoo) {
+      this._scene.remove(targetTattoo.mesh, targetTattoo.outlineMesh);
+      this._tattooInfoMap.delete(id);
+    }
+  };
   // private _eventLock = false;
 
   constructor({ container, canvas }: IConfig) {
@@ -108,7 +116,6 @@ export default class TattooViewer {
     this._planeMesh.receiveShadow = true;
     this._scene.add(this._planeMesh);
 
-    //
     // mouseHelper
     this._mouseHelper.visible = false;
     this._scene.add(this._mouseHelper);
@@ -138,7 +145,7 @@ export default class TattooViewer {
     this._renderer = new THREE.WebGLRenderer({ canvas: this._canvas, antialias: true });
     this._renderer.shadowMap.enabled = true;
     this._renderer.setPixelRatio(window.devicePixelRatio);
-    this._renderer.setSize(window.innerWidth, window.innerHeight);
+    this._renderer.setSize(this._container.offsetWidth, this._container.offsetHeight);
     this._renderer.outputEncoding = THREE.sRGBEncoding;
     this._renderer.shadowMap.enabled = true;
     this._container.appendChild(this._renderer.domElement);
@@ -210,6 +217,8 @@ export default class TattooViewer {
 
       // console.log(e.key);
     });
+
+    window.addEventListener("resize", this.resize);
   };
 
   private animate = () => {
@@ -300,8 +309,8 @@ export default class TattooViewer {
 
   private getIntersectsByMouseEvent = (e: MouseEvent) => {
     const pointer = {
-      x: (e.clientX / window.innerWidth) * 2 - 1,
-      y: -(e.clientY / window.innerHeight) * 2 + 1,
+      x: (e.clientX / this._container.offsetWidth) * 2 - 1,
+      y: -(e.clientY / this._container.offsetHeight) * 2 + 1,
     };
 
     this._raycaster.setFromCamera(pointer, this._camera);
@@ -315,20 +324,12 @@ export default class TattooViewer {
     return intersects.find((intersect) => this._tattooInfoMap.get(intersect.object.uuid))?.object?.uuid;
   };
 
-  private _onRemoveTattoo(id: string) {
-    const targetTattoo = this._tattooInfoMap.get(id);
-    if (targetTattoo) {
-      this._scene.remove(targetTattoo.mesh, targetTattoo.outlineMesh);
-      this._tattooInfoMap.delete(id);
-    }
-  }
-
   /**
    * public方法
    **/
 
   // 新增addTattoo
-  addTattoo(canvas: HTMLCanvasElement) {
+  addTattoo = (canvas: HTMLCanvasElement) => {
     const id = canvas.id;
 
     const position = new THREE.Vector3();
@@ -372,21 +373,28 @@ export default class TattooViewer {
     });
 
     this.markTattooAsActive(id);
-  }
+  };
 
-  markTattooAsActive(id: string) {
+  markTattooAsActive = (id: string) => {
     this._activeTattooId = id;
     const activeTattoo = this._tattooInfoMap.get(id)!;
 
     const outlineMesh = activeTattoo.outlineMesh;
     outlineMesh.material.color.setHex(0x6495ed);
-  }
+  };
 
-  clearActiveTattoo() {
+  clearActiveTattoo = () => {
     if (this._activeTattooId) {
       const activeTattoo = this._tattooInfoMap.get(this._activeTattooId)!;
       activeTattoo.outlineMesh.visible = false;
       this._activeTattooId = null;
     }
-  }
+  };
+
+  resize = () => {
+    this._camera.aspect = this._container.offsetWidth / this._container.offsetHeight;
+    this._camera.updateProjectionMatrix();
+
+    this._renderer.setSize(this._container.offsetWidth, this._container.offsetHeight);
+  };
 }
