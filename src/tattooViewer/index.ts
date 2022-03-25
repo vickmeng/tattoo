@@ -98,8 +98,8 @@ export default class TattooViewer {
   // 初始化
   private init = async () => {
     // 场景
-    this._scene.background = new THREE.Color(0xa0a0a0);
-    // this._scene.fog = new THREE.Fog(0xa0a0a0, 10, 50);
+    this._scene.background = new THREE.Color(0xf2f2f2);
+    // this._scene.fog = new THREE.Fog(0xf2f2f2, 10, 50);
     // 相机
     this._camera.position.set(-1000, 2000, 3000);
     // 环境光
