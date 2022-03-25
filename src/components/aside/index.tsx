@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import { tattooFilesInfoAtom } from "../../store/tattooFiles";
 import TattooCanvas from "../tattooCanvas";
-import "./index.css";
+import "./index.less";
 
 const Aside = () => {
   const [tattooFilesInfo, setTattooFilesInfo] = useRecoilState(tattooFilesInfoAtom);
