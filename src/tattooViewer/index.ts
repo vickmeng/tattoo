@@ -168,6 +168,8 @@ export default class TattooViewer {
     this._controls.update();
 
     // stats
+    this._state.dom.style.left = "auto";
+    this._state.dom.style.right = "0";
     this._container.appendChild(this._state.dom);
 
     // 开启动画

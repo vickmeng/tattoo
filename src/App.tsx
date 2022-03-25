@@ -1,14 +1,14 @@
 import "./App.less";
 import { useEffect, useRef } from "react";
 import { useRecoilState } from "recoil";
-import { Button } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
+import { RightOutlined } from "@ant-design/icons";
 import classNames from "classnames";
 
 import Aside from "./components/aside";
 import TattooViewer from "./tattooViewer";
 import { globalStore } from "./store/viewer";
 import { asideOpenAtom } from "./store/asideOpen";
+import Button from "./components/button";
 
 function App() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -40,17 +40,15 @@ function App() {
 
   const canvasWrapperCls = classNames("canvas-wrapper", { zoom: asideOpen });
 
+  const asideToggleCls = classNames("aside-toggle", { zoom: asideOpen });
+
   return (
     <div className={"main-container"}>
       <Aside />
       <div className={canvasWrapperCls} ref={containerRef}>
-        <Button
-          onClick={onAsideToggle}
-          className={"aside-toggle"}
-          type="primary"
-          shape="circle"
-          icon={<SearchOutlined />}
-        />
+        <Button onClick={onAsideToggle} className={asideToggleCls}>
+          <RightOutlined />
+        </Button>
         <canvas style={{ width: "100%", height: "100%", display: "block" }} ref={canvasRef} />
       </div>
     </div>
