@@ -26,9 +26,6 @@ const TattooCanvas = ({ info }: IProps) => {
       if (e.target?.readyState === FileReader.DONE) {
         img.src = e.target.result as string;
         img.onload = () => {
-          // eslint-disable-next-line no-console
-          console.log("img loaded");
-
           canvas.width = img.width;
           canvas.height = img.height;
           ctx.drawImage(img, 0, 0);

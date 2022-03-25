@@ -13,16 +13,19 @@ function App() {
     globalStore.tattooViewer = new TattooViewer({
       container: containerRef.current!,
       canvas: canvasRef.current!,
+      onInitSuccess() {
+        globalStore.tattooViewer!.resize();
+      },
     });
     // eslint-disable-next-line
   }, []);
 
   return (
-    <div className={"main-container"} ref={containerRef}>
+    <div className={"main-container"}>
       <Aside />
-      {/* <div style={{ width: "100%", height: "100%" }} > */}
-      <canvas style={{ width: "100%", height: "100%", display: "block" }} ref={canvasRef} />
-      {/* </div> */}
+      <div className={"canvas-wrapper"} ref={containerRef}>
+        <canvas style={{ width: "100%", height: "100%", display: "block" }} ref={canvasRef} />
+      </div>
     </div>
   );
 }
