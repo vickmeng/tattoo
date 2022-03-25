@@ -5,6 +5,8 @@ import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 import { DecalGeometry } from "three/examples/jsm/geometries/DecalGeometry";
 import Stats from "stats.js";
 
+import { computeTattooDefaultSize } from "../utils";
+
 import walkerFbxUrl from "./walker.fbx?url";
 
 THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
@@ -74,6 +76,7 @@ export default class TattooViewer {
     if (targetTattoo) {
       this._scene.remove(targetTattoo.mesh, targetTattoo.outlineMesh);
       this._tattooInfoMap.delete(id);
+      this._activeTattooId = null;
     }
   };
   // private _eventLock = false;
@@ -202,20 +205,6 @@ export default class TattooViewer {
           this._onRemoveTattoo(this._activeTattooId);
         }
       }
-      // if (e.key === "a") {
-      //   if (this._activeTattooId) {
-      //     this._rotateBackTattoo(this._activeTattooId);
-      //     // this.removeTattoo(this._activeTattooId);
-      //   }
-      // }
-      //
-      // if (e.key === "b") {
-      //   if (this._activeTattooId) {
-      //     // this.removeTattoo(this._activeTattooId);
-      //   }
-      // }
-
-      // console.log(e.key);
     });
 
     window.addEventListener("resize", this.resize);
@@ -336,8 +325,10 @@ export default class TattooViewer {
 
     const orientation = new THREE.Euler();
 
+    const [x, y] = computeTattooDefaultSize(canvas);
+
     // TODO 没能正确的理解size的z，目前已知z不涉及尺寸，与平面法向量点积有关
-    const size = new THREE.Vector3(324, 405, 200);
+    const size = new THREE.Vector3(x, y, 200);
 
     const tattooMesh = new THREE.Mesh(
       new DecalGeometry(this._walkerMesh, position, orientation, size),
