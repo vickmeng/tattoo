@@ -1,13 +1,15 @@
 import { useEffect, useRef } from "react";
+import "./index.less";
 
 import { ITattooInfo } from "../../types";
 import { globalStore } from "../../store/viewer";
 
 interface IProps {
+  className: string;
   info: ITattooInfo;
 }
 
-const TattooCanvas = ({ info }: IProps) => {
+const TattooCanvas = ({ info, className }: IProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -35,7 +37,15 @@ const TattooCanvas = ({ info }: IProps) => {
     };
   };
 
-  return <canvas id={info.id} ref={canvasRef} style={{ display: "none" }} />;
+  return (
+    <div className={className}>
+      <div className={"tattoo-viewer-wrapper"}>
+        <canvas id={info.id} ref={canvasRef} />
+      </div>
+
+      <div className={"edit-panel"}>2</div>
+    </div>
+  );
 };
 
 export default TattooCanvas;
