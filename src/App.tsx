@@ -29,13 +29,9 @@ function App() {
   const onAsideToggle = () => {
     setAsideOpen(!asideOpen);
 
-    Array(10)
-      .fill(null)
-      .forEach((v, i) => {
-        setTimeout(() => {
-          globalStore.tattooViewer?.resize();
-        }, i * 40);
-      });
+    setTimeout(() => {
+      globalStore.tattooViewer?.resize();
+    }, 400);
   };
 
   const canvasWrapperCls = classNames("canvas-wrapper", { zoom: asideOpen });
