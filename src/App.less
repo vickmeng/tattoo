@@ -3,6 +3,10 @@
     height: 100vh;
     /*position: relative;*/
     display: flex;
+
+    input[type='file'] {
+        display: none;
+    }
 }
 
 
@@ -12,26 +16,31 @@
     height: 100%;
     transition: 300ms;
     &.zoom {
-        width: calc(100vw - 600px);
+        width: calc(100vw - 800px);
     }
 }
 
 .aside-toggle {
     position: absolute;
-    top: 20px;
-    left: 20px;
+    top: 30px;
+    left: 30px;
 
     .anticon {
         transition-duration: 300ms;
     }
 
-    &.zoom {
-        left: -60px;
+    &.editing {
+        left: -80px;
 
         .anticon {
             transform: rotate(180deg);
         }
     }
-
-
 }
+
+.add-tattoo {
+    position: absolute;
+    bottom: 30px;
+    left: 30px;
+}
+

@@ -1,15 +1,26 @@
 .my-button {
-  border: 1px solid rgba(184, 241, 204, 0.0);
-  height: 55px;
-  width: 55px;
-  color: #fff;
+  height: 40px;
+  width: 40px;
+  color: #5d5d5d;
   border-radius: 100%;
-  background: rgba(184, 241, 204, 0.71);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
+  cursor: pointer;
+  background: #fff;
+  border: none;
+  transition-duration: 300ms;
 
   &:active {
     border-color: rgba(255, 255, 255, 0.3);
+  }
+
+  &.bark {
+    color: #fff;
+    background: #5d5d5d;
+    box-shadow: 4px 4px 8px #4f4f4f,
+      -4px -4px 8px #6b6b6b;;
+
+    &:active {
+      box-shadow:inset 4px 4px 8px #4f4f4f,
+        inset -4px -4px 8px #6b6b6b;
+    }
   }
 }
