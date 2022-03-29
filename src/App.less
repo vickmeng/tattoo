@@ -21,25 +21,26 @@
 }
 
 .aside-toggle {
-    position: absolute;
+    position: absolute !important;
     top: 30px;
     left: 30px;
+    transition: 300ms !important;
 
-    .anticon {
-        transition-duration: 300ms;
+    svg {
+        transition: 300ms;
     }
 
     &.editing {
         left: -80px;
 
-        .anticon {
+        svg {
             transform: rotate(180deg);
         }
     }
 }
 
 .add-tattoo {
-    position: absolute;
+    position: absolute !important;
     bottom: 30px;
     left: 30px;
 }

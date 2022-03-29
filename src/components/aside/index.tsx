@@ -1,27 +1,25 @@
 import { useRecoilState } from "recoil";
 import classNames from "classnames";
+import { Paper } from "@mui/material";
 
 import TattooEditor from "../tattooEditor";
 import { tattooFilesInfoAtom } from "../../store/tattooFiles";
 import { asideOpenAtom } from "../../store/asideOpen";
 import { editingTattooAtom } from "../../store/editingTattoo";
-import "./index.less";
 
 import TattooImg from "./tattooImg";
+
+import "./index.less";
 
 const Aside = () => {
   const [tattooFilesInfo] = useRecoilState(tattooFilesInfoAtom);
   const [asideOpen] = useRecoilState(asideOpenAtom);
-  const [editingTattoo, setEditingTattoo] = useRecoilState(editingTattooAtom);
+  const [editingTattooId, setEditingTattooId] = useRecoilState(editingTattooAtom);
 
   const cls = classNames("aside", { open: asideOpen });
 
-  const getNavItemCls = (id: string) => {
-    return classNames("nav-item", { editing: editingTattoo === id });
-  };
-
   const getEditorCls = (id: string) => {
-    return classNames("editor-wrapper", { editing: editingTattoo === id });
+    return classNames("editor-wrapper", { editing: editingTattooId === id });
   };
 
   return (
@@ -29,15 +27,16 @@ const Aside = () => {
       <nav>
         {tattooFilesInfo.map((fileInfo) => {
           return (
-            <div
+            <Paper
+              className={"nav-item"}
+              elevation={editingTattooId === fileInfo.id ? 3 : 0}
               key={fileInfo.id}
-              className={getNavItemCls(fileInfo.id)}
               onClick={() => {
-                setEditingTattoo(fileInfo.id);
+                setEditingTattooId(fileInfo.id);
               }}
             >
               <TattooImg file={fileInfo.file} />
-            </div>
+            </Paper>
           );
         })}
       </nav>
