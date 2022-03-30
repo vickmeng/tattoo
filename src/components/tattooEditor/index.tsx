@@ -1,8 +1,10 @@
 import { useEffect, useRef } from "react";
-import "./index.less";
+import { useRecoilState } from "recoil";
 
 import { ITattooInfo } from "../../types";
 import { globalStore } from "../../store/viewer";
+import { loadingAtom } from "../../store/loading";
+import "./index.less";
 
 interface IProps {
   className: string;
@@ -11,6 +13,7 @@ interface IProps {
 
 const TattooCanvas = ({ info, className }: IProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [, setLoading] = useRecoilState(loadingAtom);
 
   useEffect(() => {
     loadCanvas();
@@ -18,6 +21,8 @@ const TattooCanvas = ({ info, className }: IProps) => {
   }, []);
 
   const loadCanvas = () => {
+    setLoading(true);
+
     const canvas = canvasRef.current!;
 
     const ctx = canvas.getContext("2d")!;
@@ -34,6 +39,8 @@ const TattooCanvas = ({ info, className }: IProps) => {
           globalStore.tattooViewer!.addTattoo(canvas);
         };
       }
+
+      setLoading(false);
     };
   };
 
