@@ -1,9 +1,11 @@
 import { useEffect, useRef } from "react";
 import { useRecoilState } from "recoil";
+import { Slider } from "@mui/material";
 
 import { ITattooInfo } from "../../types";
 import { globalStore } from "../../store/viewer";
 import { loadingAtom } from "../../store/loading";
+
 import "./index.less";
 
 interface IProps {
@@ -44,13 +46,27 @@ const TattooCanvas = ({ info, className }: IProps) => {
     };
   };
 
+  const onRotate = (value: number) => {
+    globalStore.tattooViewer?.rotate(info.id, value);
+  };
+
   return (
     <div className={className}>
       <div className={"tattoo-viewer-wrapper"}>
         <canvas id={info.id} ref={canvasRef} />
       </div>
 
-      <div className={"edit-panel"}>2</div>
+      <div className={"edit-panel"}>
+        <div>旋转</div>
+        <Slider
+          defaultValue={0}
+          min={-1 * Math.PI * 10}
+          max={Math.PI * 10}
+          onChangeCommitted={(e, v) => {
+            onRotate((v as number) / 10);
+          }}
+        />
+      </div>
     </div>
   );
 };

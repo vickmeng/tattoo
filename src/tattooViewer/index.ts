@@ -23,8 +23,10 @@ interface ITattooInfo {
   id: string | number;
   canvas: HTMLCanvasElement;
   mesh: THREE.Mesh<DecalGeometry, THREE.MeshPhongMaterial>;
-  size: THREE.Vector3;
   outlineMesh: THREE.Mesh<DecalGeometry, THREE.MeshBasicMaterial>;
+  size: THREE.Vector3;
+  position: THREE.Vector3;
+  orientation: THREE.Euler;
 }
 
 export default class TattooViewer {
@@ -281,15 +283,43 @@ export default class TattooViewer {
 
     const size = new THREE.Vector3().copy(activeTattoo.size);
 
+    this.updateTattooMesh(activeTattoo, { position, size, orientation });
+
+    // const newDecalGeometry = new DecalGeometry(this._walkerMesh, position, orientation, size);
+    //
+    // tattooMesh.geometry = newDecalGeometry;
+    //
+    // const outlineMesh = activeTattoo.outlineMesh;
+    // outlineMesh.visible = true;
+    //
+    // const outlineGeometry = new DecalGeometry(this._walkerMesh, position, orientation, new THREE.Vector3().copy(size));
+    // outlineMesh.geometry = outlineGeometry;
+  };
+
+  private updateTattooMesh = (
+    tattoo: ITattooInfo,
+    options: {
+      position?: THREE.Vector3;
+      orientation?: THREE.Euler;
+      size?: THREE.Vector3;
+    } = {}
+  ) => {
+    const tattooMesh = tattoo.mesh;
+    const outlineMesh = tattoo.outlineMesh;
+    const { position = tattoo.position, orientation = tattoo.orientation, size = tattoo.size } = options;
+
     const newDecalGeometry = new DecalGeometry(this._walkerMesh, position, orientation, size);
 
     tattooMesh.geometry = newDecalGeometry;
 
-    const outlineMesh = activeTattoo.outlineMesh;
     outlineMesh.visible = true;
 
     const outlineGeometry = new DecalGeometry(this._walkerMesh, position, orientation, new THREE.Vector3().copy(size));
     outlineMesh.geometry = outlineGeometry;
+
+    tattoo.position = position;
+    tattoo.orientation = orientation;
+    tattoo.size = size;
   };
 
   private moveMouseHelper = (walkerIntersect: THREE.Intersection) => {
@@ -365,8 +395,10 @@ export default class TattooViewer {
       id,
       canvas,
       mesh: tattooMesh,
-      size,
       outlineMesh: tattooOutlineMesh,
+      size,
+      orientation,
+      position,
     });
 
     this.markTattooAsActive(id);
@@ -386,6 +418,19 @@ export default class TattooViewer {
       activeTattoo.outlineMesh.visible = false;
       this._activeTattooId = null;
     }
+  };
+
+  rotate = (id: string, value: number) => {
+    const tattoo = this._tattooInfoMap.get(id);
+
+    if (!tattoo) {
+      return null;
+    }
+
+    const orientation = new THREE.Euler().copy(tattoo.orientation);
+    orientation.z = value;
+
+    this.updateTattooMesh(tattoo, { orientation });
   };
 
   resize = () => {
