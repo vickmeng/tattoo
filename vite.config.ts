@@ -7,4 +7,6 @@ export default defineConfig({
   build: {
     outDir: "docs",
   },
+  // @ts-ignore
+  base: process.env.NODE_ENV === "production" ? "tattoo" : "",
 });
