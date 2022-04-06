@@ -11,6 +11,7 @@ import { tattooFilesInfoAtom } from "./store/tattooFiles";
 import { loadingAtom } from "./store/loading";
 import TattooCanvas from "./components/tattooEditor";
 import { editingTattooIdAtom } from "./store/editingTattooId";
+import SkinEditor from "./components/skinEditor";
 
 function App() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -47,6 +48,8 @@ function App() {
       {tattooFilesInfo.map((info) => {
         return <TattooCanvas info={info} key={info.id} />;
       })}
+
+      <SkinEditor />
 
       <label htmlFor="upload-input">
         <input
