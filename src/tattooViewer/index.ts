@@ -289,8 +289,10 @@ export default class TattooViewer {
     const activeTattoo = this._tattooInfoMap.get(this.activeTattooId!)!;
 
     const tattooMesh = activeTattoo.mesh;
+    const outlineMesh = activeTattoo.outlineMesh;
 
     tattooMesh.visible = true;
+    outlineMesh.visible = true;
 
     const position = new THREE.Vector3().copy(walkerIntersect.point);
 
@@ -375,8 +377,8 @@ export default class TattooViewer {
       new DecalGeometry(this._walkerMesh, position, orientation, size),
       new THREE.MeshPhongMaterial({
         map: new THREE.CanvasTexture(canvas),
-        // transparent: true,
-        // opacity: 1,
+        transparent: true,
+        opacity: 1,
       })
     );
 
@@ -391,8 +393,6 @@ export default class TattooViewer {
         opacity: 0.3,
       })
     );
-
-    tattooOutlineMesh.visible = false;
 
     this._scene.add(tattooOutlineMesh, tattooMesh);
 
@@ -415,7 +415,6 @@ export default class TattooViewer {
     const activeTattoo = this._tattooInfoMap.get(id)!;
 
     const outlineMesh = activeTattoo.outlineMesh;
-    outlineMesh.visible = true;
     outlineMesh.material.color.setHex(0x6495ed);
   };
 
