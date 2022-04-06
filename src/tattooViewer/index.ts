@@ -185,6 +185,8 @@ export default class TattooViewer {
     // stats
     this._state.dom.style.left = "auto";
     this._state.dom.style.right = "0";
+    this._state.dom.style.top = "auto";
+    this._state.dom.style.bottom = "0";
     this._container.appendChild(this._state.dom);
 
     // 开启动画
@@ -297,16 +299,6 @@ export default class TattooViewer {
     const size = new THREE.Vector3().copy(activeTattoo.size);
 
     this.updateTattooMesh(activeTattoo, { position, size, orientation });
-
-    // const newDecalGeometry = new DecalGeometry(this._walkerMesh, position, orientation, size);
-    //
-    // tattooMesh.geometry = newDecalGeometry;
-    //
-    // const outlineMesh = activeTattoo.outlineMesh;
-    // outlineMesh.visible = true;
-    //
-    // const outlineGeometry = new DecalGeometry(this._walkerMesh, position, orientation, new THREE.Vector3().copy(size));
-    // outlineMesh.geometry = outlineGeometry;
   };
 
   private updateTattooMesh = (
