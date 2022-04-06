@@ -4,23 +4,24 @@ import { Button, Slider } from "@mui/material";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
 import { debounce } from "lodash";
+import classNames from "classnames";
 
 import { ITattooInfo } from "../../types";
-import { globalStore } from "../../store/viewer";
 import { loadingAtom } from "../../store/loading";
-
+import { globalStore } from "../../store/viewer";
+import { editingTattooIdAtom } from "../../store/editingTattooId";
 import "./index.less";
 
 interface IProps {
-  className: string;
   info: ITattooInfo;
 }
 
-const TattooCanvas = ({ info, className }: IProps) => {
+const TattooCanvas = ({ info }: IProps) => {
   const [scale, setScale] = useState(1);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [, setLoading] = useRecoilState(loadingAtom);
+  const [editingTattooId] = useRecoilState(editingTattooIdAtom);
 
   useEffect(() => {
     loadCanvas();
@@ -66,11 +67,11 @@ const TattooCanvas = ({ info, className }: IProps) => {
     globalStore.tattooViewer?.rotate(info.id, value);
   };
 
+  const className = classNames("tattoo-editor-wrapper", { editing: info.id === editingTattooId });
+
   return (
     <div className={className}>
-      <div className={"tattoo-viewer-wrapper"}>
-        <canvas id={info.id} ref={canvasRef} />
-      </div>
+      <canvas className={"tattoo"} id={info.id} ref={canvasRef} />
 
       <div className={"edit-panel"}>
         <div>旋转</div>

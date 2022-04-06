@@ -17,6 +17,7 @@ interface IConfig {
   container: HTMLElement;
   canvas: HTMLCanvasElement;
   onInitSuccess: () => void;
+  activeTattooIdChange: (id?: string | null) => void;
 }
 
 interface ITattooInfo {
@@ -30,6 +31,15 @@ interface ITattooInfo {
 }
 
 export default class TattooViewer {
+  get activeTattooId() {
+    return this._activeTattooId;
+  }
+
+  set activeTattooId(id: string | null) {
+    this._activeTattooId = id;
+    this._activeTattooIdChange(id);
+  }
+
   private readonly _container!: HTMLElement;
   private readonly _canvas!: HTMLCanvasElement;
 
@@ -64,9 +74,12 @@ export default class TattooViewer {
 
   private _raycaster = new THREE.Raycaster();
 
-  constructor({ container, canvas, onInitSuccess }: IConfig) {
+  private _activeTattooIdChange!: IConfig["activeTattooIdChange"];
+
+  constructor({ container, canvas, onInitSuccess, activeTattooIdChange }: IConfig) {
     this._canvas = canvas;
     this._container = container;
+    this._activeTattooIdChange = activeTattooIdChange;
     this.init().then(() => {
       // eslint-disable-next-line no-console
       console.log("初始化完成");
@@ -91,7 +104,7 @@ export default class TattooViewer {
     if (targetTattoo) {
       this._scene.remove(targetTattoo.mesh, targetTattoo.outlineMesh);
       this._tattooInfoMap.delete(id);
-      this._activeTattooId = null;
+      this.activeTattooId = null;
     }
   };
 
@@ -187,7 +200,7 @@ export default class TattooViewer {
     this._container.addEventListener("pointerup", (e) => {
       const intersects = this.getIntersectsByMouseEvent(e);
 
-      if (this._activeTattooId) {
+      if (this.activeTattooId) {
         const walkerIntersect = intersects.find((intersect) => intersect.object.uuid === this._walkerMesh.uuid);
 
         if (!walkerIntersect) {
@@ -209,8 +222,8 @@ export default class TattooViewer {
         return;
       }
       if (e.key === "Backspace") {
-        if (this._activeTattooId) {
-          this.onRemoveTattoo(this._activeTattooId);
+        if (this.activeTattooId) {
+          this.onRemoveTattoo(this.activeTattooId);
         }
       }
     });
@@ -233,7 +246,7 @@ export default class TattooViewer {
     if (walkerIntersect) {
       this.switchMouseHelperVisible(true);
       this.moveMouseHelper(walkerIntersect);
-      if (!this._activeTattooId) {
+      if (!this.activeTattooId) {
         const tattooId = this.getPointedTattooIdFromIntersects(intersects);
 
         if (tattooId) {
@@ -261,7 +274,7 @@ export default class TattooViewer {
 
   private clearPointedTattooHighLight = () => {
     this._tattooInfoMap.forEach((tattoo) => {
-      if (tattoo.id !== this._activeTattooId) {
+      if (tattoo.id !== this.activeTattooId) {
         tattoo.outlineMesh.visible = false;
       }
     });
@@ -271,7 +284,7 @@ export default class TattooViewer {
     this.moveMouseHelper(walkerIntersect);
 
     // 移动纹身贴图
-    const activeTattoo = this._tattooInfoMap.get(this._activeTattooId!)!;
+    const activeTattoo = this._tattooInfoMap.get(this.activeTattooId!)!;
 
     const tattooMesh = activeTattoo.mesh;
 
@@ -405,7 +418,8 @@ export default class TattooViewer {
   };
 
   markTattooAsActive = (id: string) => {
-    this._activeTattooId = id;
+    this.activeTattooId = id;
+
     const activeTattoo = this._tattooInfoMap.get(id)!;
 
     const outlineMesh = activeTattoo.outlineMesh;
@@ -414,10 +428,10 @@ export default class TattooViewer {
   };
 
   clearActiveTattoo = () => {
-    if (this._activeTattooId) {
-      const activeTattoo = this._tattooInfoMap.get(this._activeTattooId)!;
+    if (this.activeTattooId) {
+      const activeTattoo = this._tattooInfoMap.get(this.activeTattooId)!;
       activeTattoo.outlineMesh.visible = false;
-      this._activeTattooId = null;
+      this.activeTattooId = null;
     }
   };
 

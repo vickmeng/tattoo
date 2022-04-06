@@ -15,33 +15,14 @@
     width: 100%;
     height: 100%;
     transition: 300ms;
-    &.zoom {
-        width: calc(100vw - 900px);
-    }
+
 }
 
-.aside-toggle {
-    position: absolute !important;
-    top: 30px;
-    left: 30px;
-    transition: 300ms !important;
-
-    svg {
-        transition: 300ms;
-    }
-
-    &.editing {
-        left: -80px;
-
-        svg {
-            transform: rotate(180deg);
-        }
-    }
-}
 
 .add-tattoo {
-    position: absolute !important;
+    position: fixed !important;
     bottom: 30px;
     left: 30px;
+    z-index: 999;
 }
 
