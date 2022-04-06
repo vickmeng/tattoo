@@ -460,4 +460,8 @@ export default class TattooViewer {
 
     this._renderer.setSize(this._container.offsetWidth, this._container.offsetHeight);
   };
+
+  setSkin = (hex: number) => {
+    this._walkerMesh.material.color.setHex(hex);
+  };
 }

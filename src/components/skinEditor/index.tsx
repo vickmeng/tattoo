@@ -1,6 +1,8 @@
 import { useState } from "react";
 import classNames from "classnames";
+
 import "./index.less";
+import { globalStore } from "../../store/viewer";
 
 // 0xffdbac
 
@@ -16,6 +18,7 @@ const SkinEditor = () => {
           <div
             onClick={() => {
               setColor(_color);
+              globalStore.tattooViewer?.setSkin(Number(`0x${_color}`));
             }}
             className={classNames("color-radio", { active: _color === color })}
             key={_color}
