@@ -74,6 +74,9 @@ const TattooCanvas = ({ info }: IProps) => {
       <canvas className={"tattoo"} id={info.id} ref={canvasRef} />
 
       <div className={"edit-panel"}>
+        <div>文件名</div>
+        <div className={"file-name"}>{info.file.name}</div>
+
         <div>旋转</div>
         <Slider
           defaultValue={0}
@@ -94,7 +97,7 @@ const TattooCanvas = ({ info }: IProps) => {
           <RemoveIcon />
         </Button>
 
-        {scale}
+        <span className={"scale-number"}> {scale} </span>
 
         <Button
           onClick={() => {

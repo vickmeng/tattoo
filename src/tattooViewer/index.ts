@@ -383,8 +383,8 @@ export default class TattooViewer {
       new DecalGeometry(this._walkerMesh, position, orientation, size),
       new THREE.MeshPhongMaterial({
         map: new THREE.CanvasTexture(canvas),
-        transparent: true,
-        opacity: 0.8,
+        // transparent: true,
+        // opacity: 1,
       })
     );
 
