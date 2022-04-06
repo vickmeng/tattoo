@@ -312,7 +312,7 @@ export default class TattooViewer {
 
     tattooMesh.geometry = newDecalGeometry;
 
-    outlineMesh.visible = true;
+    // outlineMesh.visible = true;
 
     const outlineGeometry = new DecalGeometry(this._walkerMesh, position, orientation, new THREE.Vector3().copy(size));
     outlineMesh.geometry = outlineGeometry;
@@ -409,6 +409,7 @@ export default class TattooViewer {
     const activeTattoo = this._tattooInfoMap.get(id)!;
 
     const outlineMesh = activeTattoo.outlineMesh;
+    outlineMesh.visible = true;
     outlineMesh.material.color.setHex(0x6495ed);
   };
 
@@ -431,6 +432,20 @@ export default class TattooViewer {
     orientation.z = value;
 
     this.updateTattooMesh(tattoo, { orientation });
+  };
+
+  scale = (id: string, value: number) => {
+    const tattoo = this._tattooInfoMap.get(id);
+
+    if (!tattoo) {
+      return null;
+    }
+
+    const [x, y] = computeTattooDefaultSize(tattoo.canvas);
+
+    const size = new THREE.Vector3(x * value, y * value, 200);
+
+    this.updateTattooMesh(tattoo, { size });
   };
 
   resize = () => {
