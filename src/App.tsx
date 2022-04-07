@@ -12,6 +12,7 @@ import { loadingAtom } from "./store/loading";
 import TattooCanvas from "./components/tattooEditor";
 import { editingTattooIdAtom } from "./store/editingTattooId";
 import SkinEditor from "./components/skinEditor";
+import YSlider from "./components/ySlider";
 
 function App() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -50,6 +51,8 @@ function App() {
       })}
 
       <SkinEditor />
+
+      <YSlider />
 
       <label htmlFor="upload-input">
         <input

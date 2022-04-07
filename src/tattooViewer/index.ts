@@ -176,10 +176,11 @@ export default class TattooViewer {
     this._raycaster.firstHitOnly = true;
     // 控制器
     this._controls = new OrbitControls(this._camera, this._renderer.domElement);
-    this._controls.enablePan = false;
+    // this._controls.enablePan = false;
     // this._controls.enableZoom = false;
     // this._controls.target.set(0, 1000, 0);
     this._controls.target.set(0, 1000, 0);
+
     this._controls.update();
 
     // stats
@@ -462,5 +463,10 @@ export default class TattooViewer {
 
   setSkin = (hex: number) => {
     this._walkerMesh.material.color.setHex(hex);
+  };
+
+  lookAt = (y: number) => {
+    this._controls.target.setY(y);
+    this._controls.update();
   };
 }
